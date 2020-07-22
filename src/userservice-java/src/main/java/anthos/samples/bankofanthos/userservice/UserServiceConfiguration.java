@@ -16,12 +16,16 @@
 
 package anthos.samples.bankofanthos.userservice;
 
+import com.google.cloud.MetadataConfig;
+import io.micrometer.stackdriver.StackdriverConfig;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +38,44 @@ public class UserServiceConfiguration {
 
   @Value("${user-service.token-expiry-seconds}")
   private int tokenExpirySeconds;
+
+  /**
+   * Provides the configuration needed by metrics collection via Micrometer.
+   */
+  @Bean
+  public StackdriverConfig stackdriverConfig() {
+    return new StackdriverConfig() {
+      @Override
+      public String projectId() {
+        return MetadataConfig.getProjectId();
+      }
+
+      @Override
+      public String get(String key) {
+        return null;
+      }
+      @Override
+      public String resourceType() {
+        return "k8s_container";
+      }
+
+      @Override
+      public Map<String, String> resourceLabels() {
+        Map<String, String> map = new HashMap<>();
+
+        String podName = System.getenv("HOSTNAME");
+        String containerName = podName.substring(0,podName.indexOf("-"));
+
+        map.put("namespace_name", "default");
+        map.put("container_name", containerName);
+        map.put("pod_name", podName);
+        map.put("cluster_name", MetadataConfig.getClusterName());
+        map.put("location", MetadataConfig.getZone());
+
+        return map;
+      }
+    };
+  }
 
   @Bean
   public JwtTokenProvider jwtTokenProvider() throws Exception {
