@@ -107,11 +107,12 @@ public class LedgerWriterApplication {
                 String podName = System.getenv("HOSTNAME");
                 String containerName = podName.substring(0,
                     podName.indexOf("-"));
+
                 map.put("location", MetadataConfig.getZone());
                 map.put("container_name", containerName);
                 map.put("pod_name", podName);
                 map.put("cluster_name", MetadataConfig.getClusterName());
-                map.put("namespace_name", System.getenv("NAMESPACE"));
+                map.put("namespace_name", "default");
                 return map;
             }
         }).build();

@@ -16,27 +16,27 @@ apiVersion: skaffold/v2alpha4
 kind: Config
 build:
   artifacts:
-  - image: gcr.io/bank-of-anthos/frontend
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/frontend
     context: src/frontend
-  - image: gcr.io/bank-of-anthos/ledgerwriter
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/ledgerwriter
     jib:
       project: src/ledgerwriter
-  - image: gcr.io/bank-of-anthos/balancereader
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/balancereader
     jib:
       project: src/balancereader
-  - image: gcr.io/bank-of-anthos/transactionhistory
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/transactionhistory
     jib:
       project: src/transactionhistory
-  - image: gcr.io/bank-of-anthos/contacts
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/contacts
     context: src/contacts
-  - image: gcr.io/bank-of-anthos/userservice
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/userservice
     context: src/userservice
-  - image: gcr.io/bank-of-anthos/userservice-java
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/userservice-java
     jib:
       project: src/userservice-java
-  - image: gcr.io/bank-of-anthos/loadgenerator
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/loadgenerator
     context: src/loadgenerator
-  - image: gcr.io/bank-of-anthos/ledger-db
+  - image: gcr.io/next20-onair-hands-on-keynote/part2-demo/ledger-db
     context: src/ledger-db
   tagPolicy:
     gitCommit: {}
@@ -45,7 +45,7 @@ build:
 deploy:
   kubectl:
     manifests:
-    - ./dev-kubernetes-manifests/**.yaml
+    - ./kubernetes-manifests/**.yaml
     # deploy a pre-build secret
     # in practice, this should not be checked in to source control
     #

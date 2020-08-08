@@ -28,7 +28,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: userservice
-        image: gcr.io/bank-of-anthos/userservice:v0.2.0
+        image: gcr.io/next20-onair-hands-on-keynote/part2-demo/userservice:latest
         volumeMounts:
         - name: keys
           mountPath: "/root/.ssh"
@@ -94,7 +94,7 @@ kind: Service
 metadata:
   name: userservice
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: userservice
   ports:
