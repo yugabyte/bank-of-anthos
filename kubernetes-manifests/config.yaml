@@ -36,10 +36,13 @@ kind: ConfigMap
 metadata:
   name: accounts-db-config
 data:
-  CLOUD_SQL_INSTANCE_NAME: my-kubernetes-codelab-217414:us-east1:test-instance-pg
+  # Step 3.5: Configure the Cloud SQL Instance Connection name
+  # and Postgres user information here.
+  CLOUD_SQL_INSTANCE_NAME: <YOUR_CLOUD_SQL_INSTANCE_CONNECTION_NAME>
   POSTGRES_DB: test-db
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
+
   ACCOUNTS_DB_URI: postgresql://postgres:postgres@localhost:5432/test-db
 ---
 apiVersion: v1

@@ -1,28 +1,26 @@
 ![Continuous Integration](https://github.com/GoogleCloudPlatform/anthos-finance-demo/workflows/Continuous%20Integration/badge.svg)
 
-# Bank of Anthos
+# Demo Bank - Next Keynote Demo Part 2
 
 This project simulates a bank's payment processing network using [Anthos](https://cloud.google.com/anthos/).
 Bank of Anthos allows users to create artificial accounts and simulate transactions between accounts.
 Bank of Anthos was developed to create an end-to-end sample demonstrating Anthos best practices.
 
-## Architecture
+The is branch contains the work done to refactor the User Service from a Python-based microservice
+to a Java one using the Spring Boot Framework.
 
-![Architecture Diagram](./docs/architecture.png)
+Some of the tools used to do this include:
 
-
-| Service                                          | Language      | Description                                                                                                                                  |
-| ------------------------------------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| [frontend](./src/frontend)                       | Python        | Exposes an HTTP server to serve the website. Contains login page, signup page, and home page.                                                |
-| [ledger-writer](./src/ledgerwriter)              | Java          | Accepts and validates incoming transactions before writing them to the ledger.                                                               |
-| [balance-reader](./src/balancereader)            | Java          | Provides efficient readable cache of user balances, as read from `ledger-db`.                                                                |
-| [transaction-history](./src/transactionhistory)  | Java          | Provides efficient readable cache of past transactions, as read from `ledger-db`.                                                            |
-| [ledger-db](./src/ledger-db)                     | PostgreSQL | Ledger of all transactions. Option to pre-populate with transactions for demo users.                                                         |
-| [user-service](./src/userservice)                | Python        | Manages user accounts and authentication. Signs JWTs used for authentication by other services.                                              |
-| [contacts](./src/contacts)                       | Python        | Stores list of other accounts associated with a user. Used for drop down in "Send Payment" and "Deposit" forms. |
-| [accounts-db](./src/accounts-db)                 | PostgreSQL | Database for user accounts and associated data. Option to pre-populate with demo users.                                                      |
-| [loadgenerator](./src/loadgenerator)             | Python/Locust | Continuously sends requests imitating users to the frontend. Periodically created new accounts and simulates transactions between them.      |
-
+- [Spring Cloud GCP](https://spring.io/projects/spring-cloud-gcp) - A set of libraries and
+  integrations to make it easier to use the Java Spring Framework on Google Cloud Platform.
+  
+- [Cloud Code](https://cloud.google.com/intellij) - An extension for IntelliJ and VSCode IDEs
+  that accelerates developing and deploying applications on GCP.
+  
+- [Skaffold](https://skaffold.dev/) - Allows for continuous development of Kubernetes applications.
+  
+- [Jib](https://github.com/GoogleContainerTools/jib) - A tool which helps you build optimized
+  Docker and OCI images for your Java applications without deep mastery of Docker best-practices.
 
 ## Installation
 
@@ -64,7 +62,7 @@ Postgres instance called `test-instance-pg` and set the password for the default
 Then, create a database named `test-db`.
 
 Ensure that instance connection name, database, database user, and database password, are set
-correctly in `kubernetes-manifests/accounts-db.yaml`.
+correctly in `kubernetes-manifests/config.yaml` in the `accounts-db-config` config map.
 
 ### 4 - Generate RSA key pair secret
 
