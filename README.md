@@ -2,11 +2,17 @@
 
 # Demo Bank - Next Keynote Demo Part 2
 
+This branch contains the demo code used in Part 2 of the [Application Modernization Hands-on Keynote](https://cloud.withgoogle.com/next/sf/sessions?session=GENKEY02#application-modernization)
+where the User Service is refactored to a separate Java microservice.
+
+***NOTE:** In the Keynote we referred to the bank's name as "Demo Bank", but it is also known as the
+"Bank of Anthos" demo application.*
+
 This project simulates a bank's payment processing network using [Anthos](https://cloud.google.com/anthos/).
 Bank of Anthos allows users to create artificial accounts and simulate transactions between accounts.
 Bank of Anthos was developed to create an end-to-end sample demonstrating Anthos best practices.
 
-The is branch contains the work done to refactor the User Service from a Python-based microservice
+This branch contains the work done to refactor the User Service from a Python-based microservice
 to a Java one using the Spring Boot Framework.
 
 Some of the tools used to do this include:
@@ -21,6 +27,9 @@ Some of the tools used to do this include:
   
 - [Jib](https://github.com/GoogleContainerTools/jib) - A tool which helps you build optimized
   Docker and OCI images for your Java applications without deep mastery of Docker best-practices.
+  
+All of the application migration work is placed in the `src/userservice-java` directory, and it can
+be compared with the previous Python version in the `src/userservice` directory.
 
 ## Installation
 
