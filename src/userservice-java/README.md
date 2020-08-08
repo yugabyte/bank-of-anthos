@@ -35,5 +35,5 @@ It creates and signs JWTs that are used by other services to authenticate users.
     
 ### Kubernetes Resources
 
-- [deployments/userservice](/kubernetes-manifests/userservice.yaml)
-- [service/userservice](/kubernetes-manifests/userservice.yaml)
+- [deployments/userservice](/kubernetes-manifests/userservice-java.yaml)
+- [service/userservice](/kubernetes-manifests/userservice-java.yaml)
