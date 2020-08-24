@@ -2,11 +2,15 @@
 
 # Demo Bank - Next Keynote Demo Part 2
 
-This branch contains the demo code used in Part 2 of the [Application Modernization Hands-on Keynote](https://cloud.withgoogle.com/next/sf/sessions?session=GENKEY02#application-modernization)
-where the User Service is refactored to a separate Java microservice.
+This branch contains the demo code used in Part 2 of the [Application Modernization Hands-on Keynote](https://cloud.withgoogle.com/next/sf/sessions?session=GENKEY02#application-modernization).
 
-***NOTE:** In the Keynote we referred to the bank's name as "Demo Bank", but it is also known as the
-"Bank of Anthos" demo application.*
+As a part of modernizing the application, we wanted to rewrite the Python User Service in Java.
+Normally, these migration/refactoring tasks would be very time-consuming and complex, but
+Google Cloud offers many services and tools to help with this journey and make this process
+much easier.
+
+***NOTE:** In the Keynote we referred to the bank's name as "Demo Bank", but in this repository
+it is also named as the "Bank of Anthos" demo application.*
 
 This project simulates a bank's payment processing network using [Anthos](https://cloud.google.com/anthos/).
 Bank of Anthos allows users to create artificial accounts and simulate transactions between accounts.
@@ -28,8 +32,81 @@ Some of the tools used to do this include:
 - [Jib](https://github.com/GoogleContainerTools/jib) - A tool which helps you build optimized
   Docker and OCI images for your Java applications without deep mastery of Docker best-practices.
   
-All of the application migration work is placed in the `src/userservice-java` directory, and it can
-be compared with the previous Python version in the `src/userservice` directory.
+Third-party tools mentioned:
+
+- [Spring Initializr](https://start.spring.io/) - The tool used to generated the Spring Boot
+starter code for the application.
+
+- [Test Containers](https://www.testcontainers.org/) - Convenient tool for starting services
+(databases, emulators, etc.) in containers and writing integration tests against them.
+  
+All of the application migration work is placed in the [`src/userservice-java`](https://github.com/GoogleCloudPlatform/bank-of-anthos/tree/next-demo-part-2/src/userservice-java)
+directory, and it can be compared with the previous Python version in the [`src/userservice`](https://github.com/GoogleCloudPlatform/bank-of-anthos/tree/next-demo-part-2/src/userservice)
+directory.
+
+## Demo Features
+
+This demo shows some of the great features provided by Google Cloud intended to simplify development
+and make your application as portable as possible. This section will walk through the features
+and libraries used in writing the [Java User Service](https://github.com/GoogleCloudPlatform/bank-of-anthos/tree/next-demo-part-2/src/userservice).
+
+### Google Cloud Services for Spring Boot
+
+Google Cloud offers a lot of convenient integrations to easily enable application tracing, logging,
+monitoring, accessing secrets, etc. for Java Spring Boot applications. 
+
+Simply adding the correct [Spring Cloud GCP](https://spring.io/projects/spring-cloud-gcp)
+starter dependency to your project build file (pom.xml, build.gradle, etc.) is usually enough to
+get started using the service you want.
+
+| Service     | Documentation | Spring Boot Sample |
+| ----------- | ------------------------------- | -------------- |
+| Cloud Trace | [spring-cloud-gcp-starter-trace](https://cloud.spring.io/spring-cloud-gcp/reference/html/#stackdriver-trace) | [Sample](https://github.com/spring-cloud/spring-cloud-gcp/tree/master/spring-cloud-gcp-samples/spring-cloud-gcp-trace-sample) |
+| Cloud Logging | [spring-cloud-gcp-starter-logging](https://cloud.spring.io/spring-cloud-gcp/reference/html/#stackdriver-logging) | [Sample](https://github.com/spring-cloud/spring-cloud-gcp/tree/master/spring-cloud-gcp-samples/spring-cloud-gcp-logging-sample) |
+| Cloud Monitoring | [spring-cloud-gcp-starter-monitoring](https://cloud.spring.io/spring-cloud-gcp/reference/html/#stackdriver-monitoring) | [Sample](https://github.com/spring-cloud/spring-cloud-gcp/tree/master/spring-cloud-gcp-samples/spring-cloud-gcp-metrics-sample) |
+
+Spring Cloud GCP also provides integrations for a lot of other popular Google Cloud services,
+You can also see the [reference documentation](https://cloud.spring.io/spring-cloud-gcp/reference/html)
+or our full [collection of sample applications](https://github.com/spring-cloud/spring-cloud-gcp/tree/master/spring-cloud-gcp-samples)
+for more info.
+
+### Jib
+
+We used the [Jib](https://github.com/GoogleContainerTools/jib) plugin to containerize the
+Java microservice to prepare the application for deployment.
+
+We personally don't have too much experience with Docker, so it was great to be able to rely on
+a tool to automatically containerize the Java application for us. Best of all, Jib tries its best
+to take advantage of best practices, so the resulting container image will be optimized.
+
+Our project is built through Maven, so we relied on the Jib Maven plugin:
+
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>2.5.2</version>
+        </plugin>
+    </plugins>
+</build>
+```
+
+If you want to learn more, check out the [Spring Boot + Jib code sample](https://github.com/GoogleContainerTools/jib/tree/master/examples/spring-boot)
+or see the official Jib documentation for [Maven](https://github.com/GoogleContainerTools/jib/tree/master/jib-maven-plugin)
+or [Gradle](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin).
+
+### Cloud Code Extension
+
+The [Cloud Code plugin (for IntelliJ)](https://cloud.google.com/code) is a really great IDE plugin
+to greatly accelerate your developer productivity when developing a Kubernetes application.
+
+We used this extension to deploy our Microservice to our Kubernetes cluster and quickly iterate
+on changes. You can configure Cloud Code to deploy to a local cluster (like Minikube) or
+directly to your GKE cluster in Google Cloud.
+
+Check out the [documentation](https://cloud.google.com/code/docs) to learn more.
 
 ## Installation
 
@@ -162,66 +239,6 @@ Paste the frontend IP into a web browser. You should see a log-in screen:
 Using the pre-populated username and password fields, log in as `testuser`. You should see a list of transactions, indicating that the frontend can successfully reach the backend transaction services.
 
 ![](/docs/transactions.png)
-
-## Setup for Workload Identity clusters
-
-If you have enabled [Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) on your GKE cluster ([a requirement for Anthos Service Mesh](https://cloud.google.com/service-mesh/docs/gke-anthos-cli-new-cluster#requirements)), follow these instructions to ensure that Bank of Anthos pods can communicate with GCP APIs.
-
-*Note* - These instructions have only been validated in GKE on GCP clusters. [Workload Identity is not yet supported](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#creating_a_relationship_between_ksas_and_gsas) in Anthos GKE on Prem. 
-
-
-1. **Set up Workload Identity** on your GKE cluster [using the instructions here](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#enable_on_new_cluster). These instructions create the Kubernetes Service Account (KSA) and Google Service Account (GSA) that the Bank of Anthos pods will use to authenticate to GCP. Take note of what Kubernetes `namespace` you use during setup.
-
-2. **Add IAM Roles** to your GSA. These roles allow workload identity-enabled Bank of Anthos pods to send traces and metrics to GCP. 
-
-```bash
-PROJECT_ID=<your-gcp-project-id>
-GSA_NAME=<your-gsa>
-
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-  --member "serviceAccount:${GSA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --role roles/cloudtrace.agent
-
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-  --member "serviceAccount:${GSA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
-  --role roles/monitoring.metricWriter
-```
-
-3. **Generate Bank of Anthos manifests** using your KSA as the Pod service account. In `kubernetes-manifests/`, replace `serviceAccountName: default` with the name of your KSA. (**Note** - sample below is Bash.)
-
-```bash
-
-KSA_NAME=<your-ksa>
-
-mkdir -p wi-kubernetes-manifests
-FILES="`pwd`/kubernetes-manifests/*"
-for f in $FILES; do
-    echo "Processing $f..."
-    sed "s/serviceAccountName: default/serviceAccountName: ${KSA_NAME}/g" $f > wi-kubernetes-manifests/`basename $f`
-done
-```
-
-4. **Deploy Bank of Anthos** to your GKE cluster using the install instructions above, except make sure that instead of the default namespace, you're deploying the manifests into your KSA namespace: 
-
-```bash
-NAMESPACE=<your-ksa-namespace>
-kubectl apply -n ${NAMESPACE} -f ./wi-kubernetes-manifests 
-```
-
-
-## Variant: Ledger Monolith Service
-
-The default app deployment uses a microservices architecture on Kubernetes. The Ledger Monolith variant deploys part of the app as a monolith service on a separate VM hosted by [Google Compute Engine](https://cloud.google.com/compute).
-
-Read more about the Ledger Monolith service under its subdirectory: [src/ledgermonolith](src/ledgermonolith/README.md)
-
-### Quick Start
-
-Deploy the Ledger Monolith to a VM and update the banking app to use it to track the bank ledger.
-
-```
-make monolith
-```
 
 ## Local Development
 
