@@ -50,4 +50,11 @@ deploy:
     # in practice, this should not be checked in to source control
     - ./extras/jwt/jwt-secret.yaml
 profiles:
-  - name: local-code
+  - name: local
+    deploy:
+      kustomize:
+        paths:
+        - ./extras/local-kind-cluster/
+      kubectl:
+        manifests:
+        - ./extras/jwt/jwt-secret.yaml
