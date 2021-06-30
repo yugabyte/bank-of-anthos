@@ -33,15 +33,8 @@ openssl x509 -req -days 365 -in frontend.csr -signkey private.key \
 # Create secret from cert
 kubectl create secret tls frontend-tls --cert=public.crt --key=private.key
 
-# Deploy app
-kubectl apply -f ../../extras/jwt/jwt-secret.yaml
-kubectl apply -f ../../kubernetes-manifests
-
-# Modify the frontend service to use an Internal LoadBalancer to disallow public traffic
-kubectl apply -f frontend-service.yaml
-
-# Apply frontend config to allow HTTP -> HTTPS redirect
-kubectl apply -f frontend-config.yaml
-
-# Create ingress, referencing the cert secret and static IP
-kubectl apply -f frontend-ingress.yaml
+# Deploy the app with:
+# 1. the frontend service modified to use an Internal LoadBalancer to disallow public traffic
+# 2. a frontend config to allow HTTP -> HTTPS redirect
+# 3. an ingress, referencing the cert secret and static IP
+kubectl apply -k ./kustomize/
