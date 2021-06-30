@@ -23,23 +23,16 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
   --role roles/monitoring.metricWriter
 ```
 
-3. **Generate Bank of Anthos manifests** using your KSA as the Pod service account. In `kubernetes-manifests/`, replace `serviceAccountName: default` with the name of your KSA. (**Note** - sample below is Bash.)
+3. **Generate Bank of Anthos manifests** using your KSA as the Pod service account. In `extras/workload-identity/`, replace `serviceAccountName: $KSA_NAME` with the name of your KSA. (**Note** - sample below is Bash.)
 
 ```bash
-
 KSA_NAME=<your-ksa>
-
-mkdir -p wi-kubernetes-manifests
-FILES="`pwd`/kubernetes-manifests/*"
-for f in $FILES; do
-    echo "Processing $f..."
-    sed "s/serviceAccountName: default/serviceAccountName: ${KSA_NAME}/g" $f > wi-kubernetes-manifests/`basename $f`
-done
+cat ./extras/workload-identity/patch_template.yaml | envsubst > ./extras/workload-identity/patch.yaml
 ```
 
-4. **Deploy Bank of Anthos** to your GKE cluster using the install instructions above, except make sure that instead of the default namespace, you're deploying the manifests into your KSA namespace: 
+4. **Deploy Bank of Anthos** to your GKE cluster by making sure that instead of the default namespace, you're deploying the manifests into your KSA namespace: 
 
 ```bash
 NAMESPACE=<your-ksa-namespace>
-kubectl apply -n ${NAMESPACE} -f ./wi-kubernetes-manifests 
+kubectl apply -n ${NAMESPACE} -k ./extras/workload-identity/ 
 ```
