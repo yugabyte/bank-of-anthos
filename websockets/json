@@ -1,0 +1,10 @@
+{
+"date": "Jan 04",
+"type": "debit",
+"account": 8494521916,
+"label": "Jake",
+"amount": "-$41.46"
+}
+
+{ \"date\": \"Jan 04\", \"type\": \"debit\", \"account\": 8494521916, \"label\": \"Jake\", \"amount\": \"-$41.46\" }
+

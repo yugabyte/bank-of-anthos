@@ -177,3 +177,5 @@ extras/asm-multicluster/asm-cluster-2/*
 *.crt
 env
 multicluster-ingress-https.yaml
+
+*~
