@@ -15,6 +15,8 @@
     log('DISCONNECT');
   };
   ws.onmessage = function(event) {
-    log('MESSAGE: ' + event.data);
+    //log('MESSAGE: ' + event.data);
+    var json = JSON.parse(event.data);
+    log('MESSAGE: ' +  '<tr><td class="text-uppercase transaction-date"><p>' + json.date + '</p></td><td class="transaction-type"><span class="text-' + json.type + '">●</span>' + json.type.replace(/(?:^|\s)\w/g, function(match) {return match.toUpperCase();}) + '</td><td class="transaction-account">' + json.account + '</td><td class="transaction-label"><span class="transaction-label-none">' + json.label + '</span></td><td class="transaction-amount transaction-amount-' + json.type +  '">' + json.amount + '</td>');
   };
 </script>
