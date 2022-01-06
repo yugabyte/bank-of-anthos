@@ -26,14 +26,19 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.spi.ObjectThreadContextMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.web.client.RestTemplate;
 
@@ -75,20 +80,72 @@ public class LedgerWriterApplication {
                 LOGGER.getLevel().toString()));
     }
 
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
+    // ==============================  REDIS ===================================
+
+    @Configuration
+    //@PropertySource("classpath:application.properties")
+    public class RedisConfig {
+
+        @Value("${spring.redis.hostname}")
+        private String redisHostName;
+
+        @Value("${spring.redis.port}")
+        private int redisPort;
+
+        @Bean
+        @Autowired
+        JedisConnectionFactory jedisConnectionFactory() {
+            JedisConnectionFactory factory = new JedisConnectionFactory();
+            factory.setHostName(redisHostName);
+            factory.setPort(redisPort);
+            return factory;
+        }
+
+        @Bean
+        @Autowired
+        public RedisTemplate<String, Object> redisTemplate() {
+            final RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
+            template.setConnectionFactory(jedisConnectionFactory());
+            template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
+            return template;
+        }
+    }
+
+    /*
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
+        return new JedisConnectionFactory();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        return template;
+    }
+    */
+    /*
     //@Configuration
-    //public class RedisConfig {        // ==============================  REDIS ===================================
+    //public class RedisConfig {
     //}
+
+    @Bean
+    public LettuceConnectionFactory lettuceConnectionFactory() {
+        return new LettuceConnectionFactory();
+    }
+
     @Bean
     public ReactiveRedisOperations<String, String> redisTemplate(){
         RedisSerializationContext<String, String> serializationContext = RedisSerializationContext.string();
-        return new ReactiveRedisTemplate<String, String>(new LettuceConnectionFactory(), serializationContext);
+        return new ReactiveRedisTemplate<String, String>(lettuceConnectionFactory(), serializationContext);
     }
-
+    */
     @PreDestroy
     public void destroy() {
         LOGGER.info("LedgerWriter service shutting down");

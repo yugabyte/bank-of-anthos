@@ -32,6 +32,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -76,7 +78,7 @@ public final class LedgerWriterController {
     RestTemplate restTemplate;
 
     @Autowired
-    ReactiveRedisOperations<String, String> redisTemplate;  // ================= REDIS ====================
+    RedisTemplate<String, Object> redisTemplate;  // ============================ REDIS ==========================
 
     /**
     * Constructor.
