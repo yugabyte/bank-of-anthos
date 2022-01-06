@@ -25,9 +25,16 @@ import javax.annotation.PreDestroy;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.spi.ObjectThreadContextMap;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -71,6 +78,15 @@ public class LedgerWriterApplication {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
+    }
+
+    //@Configuration
+    //public class RedisConfig {        // ==============================  REDIS ===================================
+    //}
+    @Bean
+    public ReactiveRedisOperations<String, String> redisTemplate(){
+        RedisSerializationContext<String, String> serializationContext = RedisSerializationContext.string();
+        return new ReactiveRedisTemplate<String, String>(new LettuceConnectionFactory(), serializationContext);
     }
 
     @PreDestroy
