@@ -5,9 +5,11 @@ import redis
 import json
 import sys
 
-CHANNEL="chan"
+REDIS_HOST="redis"
+REDIS_PORT=6379
+CHANNEL="xactions"
 
-r = redis.Redis(host='localhost', port=6379)
+r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 pubsub = r.pubsub()
 pubsub.subscribe(CHANNEL)
 try:
@@ -16,7 +18,6 @@ try:
         # {'type': 'message', 'pattern': None, 'channel': b'chan', 'data': b'hello world'}
         # get messages only, ignore subscription notifications
         if message.get("type") == "message":
-            #print(message)
             print(message['data'].decode('utf-8'))
             sys.stdout.flush()
 
