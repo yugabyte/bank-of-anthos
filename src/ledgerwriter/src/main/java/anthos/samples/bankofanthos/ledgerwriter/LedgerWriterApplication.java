@@ -33,6 +33,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisOperations;
@@ -101,10 +102,8 @@ public class LedgerWriterApplication {
         @Bean
         @Autowired
         JedisConnectionFactory jedisConnectionFactory() {
-            JedisConnectionFactory factory = new JedisConnectionFactory();
-            factory.setHostName(redisHostName);
-            factory.setPort(redisPort);
-            return factory;
+            RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHostName, redisPort);
+            return new JedisConnectionFactory(config);
         }
 
         @Bean
