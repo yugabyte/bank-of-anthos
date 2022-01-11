@@ -178,7 +178,7 @@ public final class LedgerWriterController {
 
             // No exceptions thrown. Add to ledger
             transactionRepository.save(transaction);
-            redisTemplate.convertAndSend("xactions", "foo");  // ===================  REDIS ==================
+            redisTemplate.convertAndSend("xactions", transaction.toJSONString());  // ===================  REDIS ==================
             this.cache.put(transaction.getRequestUuid(),
                     transaction.getTransactionId());
             LOGGER.info("Submitted transaction successfully");

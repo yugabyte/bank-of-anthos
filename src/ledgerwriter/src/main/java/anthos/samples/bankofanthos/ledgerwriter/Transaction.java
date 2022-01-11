@@ -16,6 +16,8 @@
 
 package anthos.samples.bankofanthos.ledgerwriter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -29,6 +31,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import com.github.javafaker.Faker;
 
 /**
  * Defines a banking transaction.
@@ -68,6 +72,9 @@ public final class Transaction {
     private String requestUuid;
 
     private static final double CENTS_PER_DOLLAR = 100.0;
+
+    @Transient
+    private Faker faker = new Faker();
 
     public long getTransactionId() {
         return transactionId;
@@ -109,5 +116,14 @@ public final class Transaction {
     public String toString() {
         return String.format("%s->$%.2f->%s",
                 fromAccountNum, amount / CENTS_PER_DOLLAR, toAccountNum);
+    }
+
+    public String toJSONString() {
+        DateFormat dateFormat = new SimpleDateFormat("MMM dd");
+        return String.format("{ \"fromAccountNum\": \"%s\", \"toAccountNum\": \"%s\", \"amount\": \"$%.2f\", \"date\": \"%s\"" +
+                ", \"label\": \"%s %s\" }",
+                fromAccountNum, toAccountNum, amount / CENTS_PER_DOLLAR, dateFormat.format(timestamp),
+                faker.name().firstName(), faker.name().lastName()
+                );
     }
 }

@@ -105,13 +105,13 @@ limitations under the License.
             <div class="row col-lg-12 align-items-start top-row">
               <div class="col-md-8">
                 <small class="text-uppercase text-muted secondary-text">Overview</small>
-                <h2 class="header-title">Checking Account</h2>
+                <h2 class="header-title">Retail Transactions</h2>
               </div>
 
               <div class="col-md-4 account-info text-right">
                   <p>
                     <span class="account-overview account-icon material-icons">info</span>
-                    <span class="account-num-text">Account Number:</span><span class="account-number">{{ account_id }}</span>
+                    <span class="account-num-text">Account Number:</span><span class="account-number" id="my-account-number">{{ account_id }}</span>
                   </p>
               </div>
           </div>
@@ -542,6 +542,45 @@ limitations under the License.
           }
           RefreshModals();
         });
+
+        var this_uri = window.location, ws_uri;
+        if (this_uri.protocol === "https:") {
+            ws_uri = "wss://";
+        } else {
+            ws_uri = "ws://";
+        }
+        ws_uri += this_uri.hostname + ':8181';
+
+        var ws = new WebSocket(ws_uri);
+
+        const contacts = {};
+        Array.from(document.querySelector("#payment-accounts").options).forEach(function(option_element) {
+            contacts[option_element.value] = option_element.text.replace(/ - \d+$/, '');
+        });
+
+        ws.onmessage = function(event) {
+            if ('Test User' != $('#account-user-name').text()) { return; } // not the store view
+
+            var json = JSON.parse(event.data);
+            var exclude_regex = /[^0-9.-]+/g;
+            var transaction_amount = parseFloat(json.amount.replace(exclude_regex, ''));
+            var transaction_type = transaction_amount > 0 ? 'credit' : 'debit';
+            var signed_amount = transaction_type == 'credit' ? '+'+json.amount : '-'+json.amount;
+            var label = contacts[json.fromAccountNum];
+
+            if (1000000 == transaction_amount) { return; }  // ignore priming transactions
+            if (undefined == label) { label = json.label; } // transaction came from locust generator
+
+            $('#transaction-list').prepend('<tr><td class="text-uppercase transaction-date"><p>' + json.date + '</p></td><td class="transaction-type"><span class="text-' + transaction_type + '">●</span>' + transaction_type.replace(/(?:^|\s)\w/g, function(match) {return match.toUpperCase();}) + '</td><td class="transaction-account">' + json.fromAccountNum + '</td><td class="transaction-label"><span class="transaction-label-none">' + label + '</span></td><td class="transaction-amount transaction-amount-' + transaction_type +  '">' + signed_amount + '</td>')
+            if ('Alice' == label) {
+                $('#transaction-list tr:first').css("background-color", "#ff2e2e")
+            }
+
+            if ($('#transaction-list tr').length > 24) { $('#transaction-list tr:last').remove() }
+
+            var current_balance = parseFloat($('#current-balance').text().trim().replace(exclude_regex, ''));
+            $('#current-balance').text('$'+Number(current_balance + transaction_amount).toLocaleString('en-US', {minimumFractionDigits: 2}));
+        };
       </script>
     </body>
 </html>
