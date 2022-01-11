@@ -30,8 +30,10 @@ spec:
       containers:
       - name: front
         #image: gcr.io/bank-of-anthos-ci/frontend:v0.5.2
-        image: frontend:latest
-        imagePullPolicy: Never
+        image: gcr.io/yugabyte/frontend:latest
+        # Minkube next two:
+        #image: frontend:latest
+        #imagePullPolicy: Never
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"

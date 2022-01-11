@@ -15,8 +15,10 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: websocketd
-        image: websocketd:latest
-        imagePullPolicy: Never
+        image: gcr.io/yugabyte/websocketd:latest
+        # Minikube next two:
+        #image: websocketd:latest
+        #imagePullPolicy: Never
         resources:
           requests:
             cpu: 100m

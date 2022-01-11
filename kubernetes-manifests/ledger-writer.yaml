@@ -30,8 +30,10 @@ spec:
       containers:
       - name: ledgerwriter
         #image: gcr.io/bank-of-anthos-ci/ledgerwriter:v0.5.2
-        image: ledgerwriter:latest
-        imagePullPolicy: Never
+        image: gcr.io/yugabyte/ledgerwriter:latest
+        # Minikube next two:
+        #image: ledgerwriter:latest
+        #imagePullPolicy: Never
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"

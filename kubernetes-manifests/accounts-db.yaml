@@ -85,7 +85,7 @@ metadata:
   labels:
     app: accounts-db
 data:
-  POSTGRES_DB: accounts-db
-  POSTGRES_USER: accounts-admin
-  POSTGRES_PASSWORD: accounts-pwd
-  ACCOUNTS_DB_URI: postgresql://accounts-admin:accounts-pwd@accounts-db:5432/accounts-db
+  POSTGRES_DB: yugabyte
+  POSTGRES_USER: yugabyte
+  POSTGRES_PASSWORD: "@Yugabyte!23"
+  ACCOUNTS_DB_URI: postgresql://yugabyte:%40Yugabyte!23@yb-tserver-0.yb-tservers.yb-dev-jk-gke-anthos-west3.svc.cluster.local:5433/yugabyte
