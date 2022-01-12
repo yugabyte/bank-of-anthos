@@ -43,6 +43,8 @@ spec:
           value: "v0.5.2"
         - name: PORT
           value: "8080"
+        - name: WEBSOCKET_PORT
+          value: "8181"
         - name: ENABLE_TRACING
           value: "true"
         - name: SCHEME
@@ -112,3 +114,6 @@ spec:
   - name: http
     port: 80
     targetPort: 8080
+  - name: websocketd
+    port: 8181
+    targetPort: 8181

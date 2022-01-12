@@ -50,5 +50,19 @@ ADD *.py /app/
 # Copy logging configuration for gunicorn
 COPY logging.conf /logging.conf
 
-# Start server using gunicorn
-CMD gunicorn -b :$PORT --threads 4 --log-config /logging.conf --log-level=$LOG_LEVEL "frontend:create_app()"
+# websocketd stuff
+ENV WEBSKD_VERSION 0.4.1
+RUN wget https://github.com/joewalnes/websocketd/releases/download/v$WEBSKD_VERSION/websocketd-$WEBSKD_VERSION\_amd64.deb && \
+    dpkg -i websocketd-$WEBSKD_VERSION\_amd64.deb && \
+    rm websocketd-$WEBSKD_VERSION\_amd64.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip install redis
+
+COPY subscribe.py /
+COPY wrapper.sh /
+EXPOSE $WEBSOCKET_PORT
+
+# Start services
+CMD /wrapper.sh
