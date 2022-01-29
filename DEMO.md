@@ -38,7 +38,7 @@ This mode puts Docker images directly into minikube's container repository using
 
     ```
 
-1. Create two YugabyteDB clusters in different namespaces.
+1. Create two YugabyteDB clusters in different namespaces.  Give them a minute or two to start up.
 
     ```
     for namespace in yb-east yb-west
@@ -56,10 +56,8 @@ This mode puts Docker images directly into minikube's container repository using
 
     ```
     eval $(minikube -p minikube docker-env)
-    skaffold run && kubectl scale --replicas=0 deployment/loadgenerator
+    skaffold run  &&  kubectl scale --replicas=0 deployment/loadgenerator
     ```
-
-1. Verify you can login as `testuser` to http://localhost:8080 .  If not, you may have to 
 
 1. Create the database schema on the consumer side of xCluster.
 
@@ -71,6 +69,7 @@ This mode puts Docker images directly into minikube's container repository using
 1. Configure xCluster replication by running the following script on any YB master pod.
 
     ```
+    kubectl exec -i -n yb-east -c yb-master yb-master-0 -- /bin/bash <<'EOF'
     #!/bin/bash
     # setup unidirectional xCluster replication for Bank of Anthos.
     # you can run this script on any master.
@@ -85,6 +84,7 @@ This mode puts Docker images directly into minikube's container repository using
 
     set -x
     yb-admin -master_addresses $consumer_master_addresses setup_universe_replication $producer_uuid $producer_master_addresses $table_ids
+    EOF
     ```
 
 
@@ -143,11 +143,6 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
 
 ## Browser setup
 
-1. Start the load generator after you have logged in as `testuser` in your browser.  You should see transactions start to scroll in the browser.
-
-   ```
-   kubectl scale --replicas=1 deployment/loadgenerator
-   ```
 
 1. Watch the transaction counts in each of the two databases using port-forwarding to their respective ysqlsh ports.
 
@@ -159,6 +154,12 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
     watch -t "ysqlsh -p 5333 -c 'select count(*) from transactions;'"
     
     ```
+
+1. Start the load generator after you have logged in as `testuser` in your browser.  You should see transactions start to scroll in the browser.
+
+   ```
+   kubectl scale --replicas=1 deployment/loadgenerator
+   ```
 
 1. Login to another browser window as user `alice`.  Any financial transaction performed by Alice will be flagged in red in the Test User browser window.
 
@@ -182,4 +183,10 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
 
     ```
     skaffold delete
+    ```
+
+1. Delete the databases.  Deleting the namespaces is a brute force approach.
+
+    ```
+    kubectl delete ns yb-east  &&  kubectl delete ns yb-west
     ```

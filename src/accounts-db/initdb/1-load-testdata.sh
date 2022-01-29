@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # Immediately exit if any error occurs during script execution.
-set -o errexit
+#set -o errexit
 
 # Skip adding data if not enabled
 if [ "$USE_DEMO_DATA" != "True"  ]; then
@@ -36,7 +36,7 @@ readonly ENV_VARS=(
 add_user() {
   # Usage:  add_user "ACCOUNTID" "USERNAME" "FIRST_NAME"
   echo "adding user: $2"
-  psql -X -v ON_ERROR_STOP=1 -v account="$1" -v username="$2" -v firstname="$3" -v passhash="$DEFAULT_PASSHASH"  -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+  psql -X -v ON_ERROR_STOP=0 -v account="$1" -v username="$2" -v firstname="$3" -v passhash="$DEFAULT_PASSHASH"  -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     INSERT INTO users VALUES (:'account', :'username', :'passhash', :'firstname', 'User', '2000-01-01', '-5', 'Bowling Green, New York City', 'NY', '10004', '111-22-3333') ON CONFLICT DO NOTHING;
 EOSQL
 }
@@ -45,7 +45,7 @@ EOSQL
 add_external_account() {
   # Usage:  add_external_account "OWNER_USERNAME" "LABEL" "ACCOUNT" "ROUTING"
   echo "user $1 adding external account: $2"
-  psql -X -v ON_ERROR_STOP=1 -v username="$1" -v label="$2" -v account="$3" -v routing="$4"  -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+  psql -X -v ON_ERROR_STOP=0 -v username="$1" -v label="$2" -v account="$3" -v routing="$4"  -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     INSERT INTO contacts VALUES (:'username', :'label', :'account', :'routing', 'true') ON CONFLICT DO NOTHING;
 EOSQL
 }
@@ -54,7 +54,7 @@ EOSQL
 add_contact() {
   # Usage:  add_contact "OWNER_USERNAME" "CONTACT_LABEL" "CONTACT_ACCOUNT"
   echo "user $1 adding contact: $2"
-  psql -X -v ON_ERROR_STOP=1 -v username="$1" -v label="$2" -v account="$3" -v routing="$LOCAL_ROUTING_NUM" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+  psql -X -v ON_ERROR_STOP=0 -v username="$1" -v label="$2" -v account="$3" -v routing="$LOCAL_ROUTING_NUM" -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     INSERT INTO contacts VALUES (:'username', :'label', :'account', :'routing', 'false') ON CONFLICT DO NOTHING;
 EOSQL
 }
