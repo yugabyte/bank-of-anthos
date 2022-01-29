@@ -35,7 +35,7 @@ spec:
       serviceAccountName: default
       containers:
       - name: accounts-db
-        image: gcr.io/bank-of-anthos-ci/accounts-db:latest
+        image: gcr.io/bank-of-anthos-ci/accounts-db:v0.5.2
         envFrom:
           - configMapRef:
               name: environment-config
@@ -85,7 +85,9 @@ metadata:
   labels:
     app: accounts-db
 data:
-  POSTGRES_DB: accounts-db
-  POSTGRES_USER: accounts-admin
-  POSTGRES_PASSWORD: accounts-pwd
-  ACCOUNTS_DB_URI: postgresql://accounts-admin:accounts-pwd@accounts-db:5432/accounts-db
+  POSTGRES_DB: yugabyte
+  POSTGRES_USER: yugabyte
+  POSTGRES_PASSWORD: "yugabyte"
+  POSTGRES_HOST: yb-tserver-0.yb-tservers.yb-east.svc.cluster.local
+  POSTGRES_PORT: "5433"
+  ACCOUNTS_DB_URI: postgresql://yugabyte:yugabyte@yb-tserver-0.yb-tservers.yb-east.svc.cluster.local:5433/yugabyte

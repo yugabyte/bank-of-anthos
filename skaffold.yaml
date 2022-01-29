@@ -88,6 +88,7 @@ deploy:
   kubectl:
     manifests:
     - dev-kubernetes-manifests/frontend.yaml
+    - dev-kubernetes-manifests/redis.yaml
 
 ---
 
