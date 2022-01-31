@@ -6,7 +6,7 @@ This demo simulates a retail fraud detection scenario.  It is based on the [Bank
 
 Pre-requisites:
 
- * [skaffold **1.27+**](https://skaffold.dev/docs/install/) - This builds docker containers and deploys them for you, plus you don't have to fiddle with YAML files.
+ * [skaffold **1.27+**](https://skaffold.dev/docs/install/) - This builds docker containers and deploys them for you.  It also saves you from having to fiddle with YAML files.
 
 The following services have changed from the base Bank of Anthos code:
 
@@ -18,7 +18,7 @@ The following services have changed from the base Bank of Anthos code:
 
 Optional: You may find the tools [kubectx and kubens](https://github.com/ahmetb/kubectx) helpful in navigating multiple contexts and namespaces.
 
-The password to just about everything in this demo is `password`.
+The password to just about everything in the application is `password`.
 
 ## Minikube Setup
 
@@ -56,7 +56,7 @@ This mode puts Docker images directly into minikube's container repository using
 
     ```
     eval $(minikube -p minikube docker-env)
-    skaffold run  &&  kubectl scale --replicas=0 deployment/loadgenerator
+    skaffold run
     ```
 
 1. Create the database schema on the consumer side of xCluster.
@@ -97,7 +97,7 @@ This mode puts Docker images directly into minikube's container repository using
 
 ## GKE Setup
 
-XXX In this mode, you put Docker images into your local Docker, then tagged and pushed to GCP.
+The following steps assume you already have a GKE cluster created with its credentials in your current kubectl context.  You will also need the Docker daemon running on your local machine to stage the containers before they are pushed to GKE.
 
 1. Unset any minikube Docker environment variables, if present.
 
@@ -105,13 +105,32 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
     eval $(minikube -p minikube docker-env -u)
     ```
 
-1. XXX Install the JWT token as specified in the BofA README.
+1. Ensure a firewall rule exists for the websocket to reach TCP port <b>8181</b> of the GKE cluster nodes.  The "[target tags](https://stackoverflow.com/questions/60744761/adding-firewall-rule-for-gke-nodes)" of the firewall rule must match the network tag of the VMs running the k8s cluster nodes.  To find the target tag for the firewall rule in GCP, navigate to Kubernetes Engine -> Clusters -> click on your cluster -> Nodes tab -> click any node -> Details tab -> click VM Instance -> scroll down to Network Tags.  It will look something like "gke-mycluster-9894ac0e-node".
+
+1. If using Open Source YugabyteDB:
+
+    Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date so you can run YugabyteDB in minikube.
 
     ```
-    kubectl apply -f ./extras/jwt/jwt-secret.yaml
+    helm repo update
+
     ```
 
-1. Edit the postgres URIs in accounts-db.yaml and ledger-db.yaml with appropriate hostname, port, username, and password.  The jdbc URL as well as the POSTGRES_* environment variables matter.
+    Create two YugabyteDB clusters in different namespaces.  Give them a minute or two to start up.
+
+    ```
+    for namespace in yb-east yb-west
+    do
+    helm install $namespace yugabytedb/yugabyte \
+    --set resource.master.requests.cpu=0.5,resource.master.requests.memory=0.5Gi,\
+    resource.tserver.requests.cpu=0.5,resource.tserver.requests.memory=0.5Gi,\
+    replicas.master=1,replicas.tserver=1,enableLoadBalancer=False \
+    --create-namespace --namespace $namespace
+    done
+
+    ```
+
+1. If _not_ using Open Source YugabyteDB, you will need to install your enterprise cluster and edit the postgres URIs in accounts-db.yaml and ledger-db.yaml with appropriate hostname, port, username, and password.  The jdbc URL as well as the POSTGRES_* environment variables matter.
 
     Important notes:
     * You _must_ have a database password; empty passwords are not permitted.
@@ -120,13 +139,14 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
     * The values for the `POSTGRES_*` environment variables duplicate what's in the jdbc URI, but that's the way it is.
     * Keep "double quotes" around things that already have them: don't try to be clever.
 
-1. Ensure a firewall rule exists for the websocket to reach TCP port <b>8181</b> of the GKE cluster nodes.  The "[target tags](https://stackoverflow.com/questions/60744761/adding-firewall-rule-for-gke-nodes)" of the firewall rule must match the network tag of the VMs running the k8s cluster nodes.  To find the target tag for the firewall rule in GCP, navigate to Kubernetes Engine -> Clusters -> click on your cluster -> Nodes tab -> click any node -> Details tab -> click VM Instance -> scroll down to Network Tags.  It will look something like "gke-mycluster-9894ac0e-node".
 
-1. Deploy the pods to GKE.  I like to turn off the load generator until everything settles and it's time to start the demo.
+1. Deploy the pods to GKE.  You will need to tell skaffold the name of your GCP project's [image registry](https://skaffold.dev/docs/environment/image-registries/).  The registry name can be determined by navigating to your project's Container Registry and clicking on the copy icon next to the repository to get the full name.
 
     ```
-    XXX FIXME kubectl apply -f kubernetes-manifests/ && kubectl scale --replicas=0 deployment/loadgenerator
+    skaffold run --default-repo gcr.io/dataengineeringdemos/yugabyte
     ```
+
+1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".  You won't need to run the port forwarding step because it is already done for you.
 
 1. Open a browser to the IP address of the frontend service.  To find the IP address, list the k8s services and find the external IP of the frontend service's load balancer.  In the example below, the external IP is 104.198.9.211.
 
@@ -145,7 +165,7 @@ XXX In this mode, you put Docker images into your local Docker, then tagged and 
     userservice          ClusterIP      10.43.247.207   <none>          8080/TCP                      2d4h
     ```
 
-## Browser setup
+## Demo setup
 
 
 1. Watch the transaction counts in each of the two databases using port-forwarding to their respective ysqlsh ports.

@@ -87,5 +87,7 @@ metadata:
 data:
   POSTGRES_DB: yugabyte
   POSTGRES_USER: yugabyte
-  POSTGRES_PASSWORD: "@Yugabyte!23"
-  ACCOUNTS_DB_URI: postgresql://yugabyte:%40Yugabyte!23@yb-tserver-0.yb-tservers.yb-anthos-jk-platform.svc.cluster.local:5433/yugabyte
+  POSTGRES_PASSWORD: "yugabyte"
+  POSTGRES_HOST: yb-tserver-0.yb-tservers.yb-east.svc.cluster.local
+  POSTGRES_PORT: "5433"
+  ACCOUNTS_DB_URI: postgresql://yugabyte:yugabyte@yb-tserver-0.yb-tservers.yb-east.svc.cluster.local:5433/yugabyte

@@ -29,11 +29,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: front
-        #image: gcr.io/bank-of-anthos-ci/frontend:v0.5.2
-        image: gcr.io/yugabyte/frontend:latest
-        # Minkube next two:
-        #image: frontend:latest
-        #imagePullPolicy: Never
+        image: gcr.io/bank-of-anthos-ci/frontend:v0.5.2
         volumeMounts:
         - name: publickey
           mountPath: "/root/.ssh"

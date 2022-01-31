@@ -64,10 +64,12 @@ metadata:
 data:
   POSTGRES_DB: yugabyte
   POSTGRES_USER: yugabyte
-  POSTGRES_PASSWORD: "@Yugabyte!23"
-  SPRING_DATASOURCE_URL: jdbc:postgresql://yb-tserver-0.yb-tservers.yb-anthos-jk-platform.svc.cluster.local:5433/yugabyte
+  POSTGRES_PASSWORD: "yugabyte"
+  POSTGRES_HOST: yb-tserver-0.yb-tservers.yb-east.svc.cluster.local
+  POSTGRES_PORT: "5433"
+  SPRING_DATASOURCE_URL: jdbc:postgresql://yb-tserver-0.yb-tservers.yb-east.svc.cluster.local:5433/yugabyte
   SPRING_DATASOURCE_USERNAME: yugabyte # should match POSTGRES_USER
-  SPRING_DATASOURCE_PASSWORD: "@Yugabyte!23" # should match POSTGRES_PASSWORD
+  SPRING_DATASOURCE_PASSWORD: "yugabyte" # should match POSTGRES_PASSWORD
 ---
 apiVersion: v1
 kind: Service
