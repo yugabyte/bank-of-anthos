@@ -6,7 +6,7 @@ This demo simulates a retail fraud detection scenario.  It is based on the [Bank
 
 Pre-requisites:
 
- * [skaffold **1.27+**](https://skaffold.dev/docs/install/) - This will build docker containers and deploy them for you, plus you don't have to fiddle with YAML files.
+ * [skaffold **1.27+**](https://skaffold.dev/docs/install/) - This builds docker containers and deploys them for you, plus you don't have to fiddle with YAML files.
 
 The following services have changed from the base Bank of Anthos code:
 
@@ -99,9 +99,13 @@ This mode puts Docker images directly into minikube's container repository using
 
 XXX In this mode, you put Docker images into your local Docker, then tagged and pushed to GCP.
 
-1. XXX fix DOCKER ENV variables for skaffold
+1. Unset any minikube Docker environment variables, if present.
 
-1. Install the JWT token as specified in the BofA README.
+    ```
+    eval $(minikube -p minikube docker-env -u)
+    ```
+
+1. XXX Install the JWT token as specified in the BofA README.
 
     ```
     kubectl apply -f ./extras/jwt/jwt-secret.yaml
