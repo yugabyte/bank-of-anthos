@@ -139,7 +139,7 @@ The following steps assume you already have a GKE cluster created with its crede
     skaffold run --default-repo gcr.io/dataengineeringdemos/yugabyte
     ```
 
-1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".  (You won't need to run the port forwarding step because it is already done for you)
+1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".
 
 1. Ensure a firewall rule exists for the websocket to reach TCP port <b>8181</b> of the GKE cluster nodes.  The "[target tags](https://stackoverflow.com/questions/60744761/adding-firewall-rule-for-gke-nodes)" of the firewall rule must match the network tag of the VMs running the k8s cluster nodes.  To find the target tag for the firewall rule in GCP, navigate to Kubernetes Engine -> Clusters -> click on your cluster -> Nodes tab -> click any node -> Details tab -> click VM Instance -> scroll down to Network Tags.  It will look something like "gke-mycluster-9894ac0e-node".
 
