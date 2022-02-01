@@ -6,7 +6,8 @@ This demo simulates a retail fraud detection scenario.  It is based on the [Bank
 
 Pre-requisites:
 
- * [skaffold **1.27+**](https://skaffold.dev/docs/install/) - This builds docker containers and deploys them for you.  It also saves you from having to fiddle with YAML files.
+ * [skaffold](https://skaffold.dev/docs/install/) - builds docker containers and deploys them for you.  It also saves you from having to fiddle with YAML files.
+ * (Optional) [kubectx and kubens](https://github.com/ahmetb/kubectx) - helpful in navigating multiple contexts and namespaces.
 
 The following services have changed from the base Bank of Anthos code:
 
@@ -15,8 +16,6 @@ The following services have changed from the base Bank of Anthos code:
  * redis - additional container
  * accounts-db - config map has postgres URI for YugabyteDB, you need this pod to initialize the db
  * ledger-db - config map has postgres URI for YugabyteDB, you need this pod to initialize the db
-
-Optional: You may find the tools [kubectx and kubens](https://github.com/ahmetb/kubectx) helpful in navigating multiple contexts and namespaces.
 
 The password to just about everything in the application is `password`.
 
@@ -35,7 +34,6 @@ This mode puts Docker images directly into minikube's container repository using
 
     ```
     helm repo update
-
     ```
 
 1. Create two YugabyteDB clusters in different namespaces.  Give them a minute or two to start up.
@@ -49,10 +47,9 @@ This mode puts Docker images directly into minikube's container repository using
     replicas.master=1,replicas.tserver=1,enableLoadBalancer=False \
     --create-namespace --namespace $namespace
     done
-
     ```
 
-1. Build the Docker containers and deploy them into Minikube.  The [magic](https://skaffold.dev/docs/environment/local-cluster/) happens in the first eval where your environment variables point skaffold to Minikube.  I like to turn off the load generator until everything settles and it's time to start the demo.
+1. Build the Docker containers and deploy them into Minikube.  The [magic](https://skaffold.dev/docs/environment/local-cluster/) happens in the first eval where your environment variables point skaffold to Minikube.
 
     ```
     eval $(minikube -p minikube docker-env)
@@ -105,15 +102,12 @@ The following steps assume you already have a GKE cluster created with its crede
     eval $(minikube -p minikube docker-env -u)
     ```
 
-1. Ensure a firewall rule exists for the websocket to reach TCP port <b>8181</b> of the GKE cluster nodes.  The "[target tags](https://stackoverflow.com/questions/60744761/adding-firewall-rule-for-gke-nodes)" of the firewall rule must match the network tag of the VMs running the k8s cluster nodes.  To find the target tag for the firewall rule in GCP, navigate to Kubernetes Engine -> Clusters -> click on your cluster -> Nodes tab -> click any node -> Details tab -> click VM Instance -> scroll down to Network Tags.  It will look something like "gke-mycluster-9894ac0e-node".
-
 1. If using Open Source YugabyteDB:
 
     Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date so you can run YugabyteDB in minikube.
 
     ```
     helm repo update
-
     ```
 
     Create two YugabyteDB clusters in different namespaces.  Give them a minute or two to start up.
@@ -127,7 +121,6 @@ The following steps assume you already have a GKE cluster created with its crede
     replicas.master=1,replicas.tserver=1,enableLoadBalancer=False \
     --create-namespace --namespace $namespace
     done
-
     ```
 
 1. If _not_ using Open Source YugabyteDB, you will need to install your enterprise cluster and edit the postgres URIs in accounts-db.yaml and ledger-db.yaml with appropriate hostname, port, username, and password.  The jdbc URL as well as the POSTGRES_* environment variables matter.
@@ -146,7 +139,9 @@ The following steps assume you already have a GKE cluster created with its crede
     skaffold run --default-repo gcr.io/dataengineeringdemos/yugabyte
     ```
 
-1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".  You won't need to run the port forwarding step because it is already done for you.
+1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".  (You won't need to run the port forwarding step because it is already done for you)
+
+1. Ensure a firewall rule exists for the websocket to reach TCP port <b>8181</b> of the GKE cluster nodes.  The "[target tags](https://stackoverflow.com/questions/60744761/adding-firewall-rule-for-gke-nodes)" of the firewall rule must match the network tag of the VMs running the k8s cluster nodes.  To find the target tag for the firewall rule in GCP, navigate to Kubernetes Engine -> Clusters -> click on your cluster -> Nodes tab -> click any node -> Details tab -> click VM Instance -> scroll down to Network Tags.  It will look something like "gke-mycluster-9894ac0e-node".
 
 1. Open a browser to the IP address of the frontend service.  To find the IP address, list the k8s services and find the external IP of the frontend service's load balancer.  In the example below, the external IP is 104.198.9.211.
 
@@ -176,7 +171,6 @@ The following steps assume you already have a GKE cluster created with its crede
     export PGPASSWORD='yugabyte'
     watch -t "ysqlsh -p 5444 -c 'select count(*) from transactions;'"
     watch -t "ysqlsh -p 5333 -c 'select count(*) from transactions;'"
-    
     ```
 
 1. Start the load generator after you have logged in as `testuser` in your browser.  You should see transactions start to scroll in the browser.
