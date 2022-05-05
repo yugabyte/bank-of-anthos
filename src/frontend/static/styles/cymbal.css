@@ -15,7 +15,7 @@
  */
 
  html, body {
-    font-family: 'DM Sans', sans-serif !important;
+    font-family: 'Verdana', sans-serif !important;
     font-size: 1.1rem;
     margin: 0;
     padding: 0;
@@ -115,8 +115,8 @@
     font-style: normal;
     font-weight: 700;
     font-size: 1.5rem !important;
-    letter-spacing: 0.25em !important;
-    color: #000000 !important;
+    letter-spacing: 0.10em !important;
+    color: #3e902d !important;
   }
   .nav-link i {
     font-size: 20px;

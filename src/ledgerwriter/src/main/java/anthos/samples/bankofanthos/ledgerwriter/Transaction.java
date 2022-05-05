@@ -118,11 +118,18 @@ public final class Transaction {
                 fromAccountNum, amount / CENTS_PER_DOLLAR, toAccountNum);
     }
 
+    private int firstDigit(int x) {
+    	while (x > 9) {
+        	x /= 10;
+    	}
+    	return x;
+    }
+
     public String toJSONString() {
         DateFormat dateFormat = new SimpleDateFormat("MMM dd");
-        return String.format("{ \"fromAccountNum\": \"%s\", \"toAccountNum\": \"%s\", \"amount\": \"$%.2f\", \"date\": \"%s\"" +
+        return String.format("{ \"fromAccountNum\": \"%s\", \"toAccountNum\": \"%s\", \"amount\": \"%d\", \"date\": \"%s\"" +
                 ", \"label\": \"%s %s\" }",
-                fromAccountNum, toAccountNum, amount / CENTS_PER_DOLLAR, dateFormat.format(timestamp),
+                fromAccountNum, toAccountNum, firstDigit(amount /*/ CENTS_PER_DOLLAR*/), dateFormat.format(timestamp),
                 faker.name().firstName(), faker.name().lastName()
                 );
     }

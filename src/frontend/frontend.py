@@ -489,7 +489,8 @@ def create_app():
         """ Format the input currency in a human readable way """
         if int_amount is None:
             return '$---'
-        amount_str = '${:0,.2f}'.format(abs(Decimal(int_amount)/100))
+        amount_str = '{:0.0f}'.format(abs(Decimal(int_amount)/100))
+        amount_str = amount_str[0] # display the first digit only
         if int_amount < 0:
             amount_str = '-' + amount_str
         return amount_str
