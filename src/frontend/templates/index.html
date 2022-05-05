@@ -29,6 +29,7 @@ limitations under the License.
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <link rel="preconnect" href="https://fonts.gstatic.com">
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+      <link href="http://fonts.cdnfonts.com/css/opificio" rel="stylesheet">
       <link rel="stylesheet" href="static/styles/cymbal.css">
 
    </head>
@@ -564,8 +565,9 @@ limitations under the License.
             var json = JSON.parse(event.data);
             var exclude_regex = /[^0-9.-]+/g;
             var transaction_amount = parseFloat(json.amount.replace(exclude_regex, ''));
-            var transaction_type = transaction_amount > 0 ? 'credit' : 'debit';
-            var signed_amount = transaction_type == 'credit' ? '+'+json.amount : '-'+json.amount;
+            var transaction_type = transaction_amount > 0 ? 'debit' : 'credit'; // reverse logic
+            //var signed_amount = transaction_type == 'credit' ? '+'+json.amount : '-'+json.amount;
+            var signed_amount = '-'+json.amount;
             var label = contacts[json.fromAccountNum];
 
             if (1000000 == transaction_amount) { return; }  // ignore priming transactions
