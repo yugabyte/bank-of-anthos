@@ -104,7 +104,7 @@ The following steps assume you already have a GKE cluster created with its crede
 
 1. If using Open Source YugabyteDB:
 
-    Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date so you can run YugabyteDB in minikube.
+    Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date.
 
     ```
     helm repo update
