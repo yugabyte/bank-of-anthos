@@ -13,11 +13,11 @@ The following services have changed from the base Bank of Anthos code:
 
  * ledgerwriter - publishes each transaction to a redis topic
  * frontend - websocketd prints redis topic subscriber's output
- * redis - additional container
+ * redis - additional container for pubsub
  * accounts-db - config map has postgres URI for YugabyteDB, you need this pod to initialize the db
  * ledger-db - config map has postgres URI for YugabyteDB, you need this pod to initialize the db
 
-The password to just about everything in the application is `password`.
+The password to every user account in the application is `password`.
 
 ## Minikube Setup
 
@@ -30,7 +30,7 @@ This mode puts Docker images directly into minikube's container repository using
     minikube addons enable gcp-auth
     ```
 
-1. Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date so you can run YugabyteDB in minikube.
+1. Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date.
 
     ```
     helm repo update
@@ -123,21 +123,23 @@ The following steps assume you already have a GKE cluster created with its crede
     done
     ```
 
-1. If _not_ using Open Source YugabyteDB, you will need to install your enterprise cluster and edit the postgres URIs in accounts-db.yaml and ledger-db.yaml with appropriate hostname, port, username, and password.  The jdbc URL as well as the POSTGRES_* environment variables matter.
+1. If _not_ using Open Source YugabyteDB, you will need to install your enterprise cluster and edit the postgres URIs in `accounts-db.yaml` and `ledger-db.yaml` with appropriate hostname, port, username, and password.  The jdbc URI as well as the POSTGRES_* environment variables matter.
 
     Important notes:
-    * You _must_ have a database password; empty passwords are not permitted.
+    * You _must_ have a database password; empty passwords will not work.
     * If the URI begins with `postgresql:` then you put the username and password into the URI itself (as well as the other lines in that file).
     * If the URI begins with `jdbc:` then that is a SPRING_DATASOURCE URI that _does not_ include the username and password; those go in separate variables on other lines (only).
     * The values for the `POSTGRES_*` environment variables duplicate what's in the jdbc URI, but that's the way it is.
     * Keep "double quotes" around things that already have them: don't try to be clever.
 
 
-1. Deploy the pods to GKE.  You will need to tell skaffold the name of your GCP project's [image registry](https://skaffold.dev/docs/environment/image-registries/).  The registry name can be determined by navigating to your project's Container Registry and clicking on the copy icon next to the repository to get the full name.
+1. Deploy the pods to GKE.  You will need to tell skaffold the name of your GCP project's [image registry](https://skaffold.dev/docs/environment/image-registries/).  The registry name can be determined by navigating to your project's Container Registry and observing your browser's address bar to get the full name.
 
     ```
-    skaffold run --default-repo gcr.io/dataengineeringdemos/yugabyte
+    skaffold run --default-repo gcr.io/yb-americas-presales/yugabyte
     ```
+
+   GKE Container Registry visibility should be set to **Public** under Settings.
 
 1. Setup xCluster replication by running the two steps from the Minikube section above entitled, "Create the database schema on the consumer side" and "Configure xCluster replication".
 
@@ -179,7 +181,7 @@ The following steps assume you already have a GKE cluster created with its crede
    kubectl scale --replicas=1 deployment/loadgenerator
    ```
 
-1. Login to another browser window as user `alice`.  Any financial transaction performed by Alice will be flagged in red in the Test User browser window.
+1. Login to another browser window as user `alice`.  Any financial transaction performed by Alice will be flagged in red in the Test User's browser window.
 
 ## Talk Track
 
@@ -208,3 +210,21 @@ The following steps assume you already have a GKE cluster created with its crede
     ```
     kubectl delete ns yb-east  &&  kubectl delete ns yb-west
     ```
+
+## Troubleshooting
+
+1. Docker on macOS may require the DOCKER_HOST environment variable in order to find the socket.
+
+    ```
+    export DOCKER_HOST=unix://$HOME/.docker/run/docker.sock
+    ```
+
+1. You may need to execute `skaffold run` with the `--skip-tests` option the very first time you build the containers.
+
+1. Special characters in unquoted postgresql URIs need to be escaped.  For example, a password of `Passw0rd!` would become:
+
+    ```
+    postgresql://yugabyte:Passw0rd%21@someservice.svc.cluster.local:5433/yugabyte
+    ```
+
+1. Browser security extensions may block the websocket that shows live transactions even though port 8181 is correctly opened.  Check using your browser's developer tools.

@@ -1,106 +1,91 @@
-# Copyright 2019 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-apiVersion: skaffold/v2beta18
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
-  name: setup # module defining setup steps
-deploy:
-  kubectl:
-    manifests: 
+  name: setup
+manifests:
+  rawYaml:
     - extras/jwt/jwt-secret.yaml
     - dev-kubernetes-manifests/config.yaml
-
+deploy:
+  kubectl: {}
 ---
-
-apiVersion: skaffold/v2beta18
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
-  name: db # module defining database deployments
+  name: db
 requires:
-  - configs: [setup]
+  - configs:
+      - setup
 build:
   artifacts:
-  - image: gcr.io/bank-of-anthos-ci/accounts-db
-    context: src/accounts-db
-  - image: gcr.io/bank-of-anthos-ci/ledger-db
-    context: src/ledger-db
-deploy:
-  kubectl:
-    manifests:
+    - image: gcr.io/bank-of-anthos-ci/accounts-db
+      context: src/accounts-db
+    - image: gcr.io/bank-of-anthos-ci/ledger-db
+      context: src/ledger-db
+manifests:
+  rawYaml:
     - dev-kubernetes-manifests/accounts-db.yaml
     - dev-kubernetes-manifests/ledger-db.yaml
-
+deploy:
+  kubectl: {}
 ---
-
-apiVersion: skaffold/v2beta18
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
-  name: backend # module defining backend services
+  name: backend
 requires:
-  - configs: [db]
+  - configs:
+      - db
 build:
   artifacts:
-  - image: gcr.io/bank-of-anthos-ci/ledgerwriter
-    jib:
-      project: src/ledgerwriter
-  - image: gcr.io/bank-of-anthos-ci/balancereader
-    jib:
-      project: src/balancereader
-  - image: gcr.io/bank-of-anthos-ci/transactionhistory
-    jib:
-      project: src/transactionhistory
-  - image: gcr.io/bank-of-anthos-ci/contacts
-    context: src/contacts
-  - image: gcr.io/bank-of-anthos-ci/userservice
-    context: src/userservice
-deploy:
-  kubectl:
-    manifests:
+    - image: gcr.io/bank-of-anthos-ci/ledgerwriter
+      jib:
+        project: src/ledgerwriter
+    - image: gcr.io/bank-of-anthos-ci/balancereader
+      jib:
+        project: src/balancereader
+    - image: gcr.io/bank-of-anthos-ci/transactionhistory
+      jib:
+        project: src/transactionhistory
+    - image: gcr.io/bank-of-anthos-ci/contacts
+      context: src/contacts
+    - image: gcr.io/bank-of-anthos-ci/userservice
+      context: src/userservice
+manifests:
+  rawYaml:
     - dev-kubernetes-manifests/balance-reader.yaml
     - dev-kubernetes-manifests/contacts.yaml
     - dev-kubernetes-manifests/ledger-writer.yaml
     - dev-kubernetes-manifests/transaction-history.yaml
     - dev-kubernetes-manifests/userservice.yaml
-
+deploy:
+  kubectl: {}
 ---
-
-apiVersion: skaffold/v2beta18
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
-  name: frontend # module defining frontend service
+  name: frontend
 build:
   artifacts:
-  - image: gcr.io/bank-of-anthos-ci/frontend
-    context: src/frontend
-deploy:
-  kubectl:
-    manifests:
+    - image: gcr.io/bank-of-anthos-ci/frontend
+      context: src/frontend
+manifests:
+  rawYaml:
     - dev-kubernetes-manifests/frontend.yaml
     - dev-kubernetes-manifests/redis.yaml
-
+deploy:
+  kubectl: {}
 ---
-
-apiVersion: skaffold/v2beta18
+apiVersion: skaffold/v4beta4
 kind: Config
 metadata:
-  name: loadgenerator # module defining a load generator service
+  name: loadgenerator
 build:
   artifacts:
-  - image: gcr.io/bank-of-anthos-ci/loadgenerator
-    context: src/loadgenerator
-deploy:
-  kubectl:
-    manifests:
+    - image: gcr.io/bank-of-anthos-ci/loadgenerator
+      context: src/loadgenerator
+manifests:
+  rawYaml:
     - dev-kubernetes-manifests/loadgenerator.yaml
+deploy:
+  kubectl: {}
