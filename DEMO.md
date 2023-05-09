@@ -127,7 +127,10 @@ The following steps assume you already have a GKE cluster created with its crede
 
     Important notes:
     * You _must_ have a database password; empty passwords will not work.
-    * If the URI begins with `postgresql:` then you put the username and password into the URI itself (as well as the other lines in that file).
+    * If the URI begins with `postgresql:` then you put the username and password into the URI itself (as well as the other lines in that file).  Special characters in unquoted postgresql URIs need to be escaped.  For example, a password of `Passw0rd!` would become:
+        ```
+        postgresql://yugabyte:Passw0rd%21@someservice.svc.cluster.local:5433/yugabyte
+        ```
     * If the URI begins with `jdbc:` then that is a SPRING_DATASOURCE URI that _does not_ include the username and password; those go in separate variables on other lines (only).
     * The values for the `POSTGRES_*` environment variables duplicate what's in the jdbc URI, but that's the way it is.
     * Keep "double quotes" around things that already have them: don't try to be clever.
@@ -221,10 +224,4 @@ The following steps assume you already have a GKE cluster created with its crede
 
 1. You may need to execute `skaffold run` with the `--skip-tests` option the very first time you build the containers.
 
-1. Special characters in unquoted postgresql URIs need to be escaped.  For example, a password of `Passw0rd!` would become:
-
-    ```
-    postgresql://yugabyte:Passw0rd%21@someservice.svc.cluster.local:5433/yugabyte
-    ```
-
-1. Browser security extensions may block the websocket that shows live transactions even though port 8181 is correctly opened.  Check using your browser's developer tools.
+1. Browser security extensions may block the websocket that shows live account activity even though port 8181 is correctly opened.  Check using your browser's developer tools.
