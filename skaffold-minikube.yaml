@@ -1,0 +1,91 @@
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: setup
+manifests:
+  rawYaml:
+    - extras/jwt/jwt-secret.yaml
+    - kubernetes-manifests/config.yaml
+deploy:
+  kubectl: {}
+---
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: db
+requires:
+  - configs:
+      - setup
+build:
+  artifacts:
+    - image: gcr.io/bank-of-anthos-ci/accounts-db
+      context: src/accounts-db
+    - image: gcr.io/bank-of-anthos-ci/ledger-db
+      context: src/ledger-db
+manifests:
+  rawYaml:
+    - kubernetes-manifests/accounts-db.yaml
+    - kubernetes-manifests/ledger-db.yaml
+deploy:
+  kubectl: {}
+---
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: backend
+requires:
+  - configs:
+      - db
+build:
+  artifacts:
+    - image: gcr.io/bank-of-anthos-ci/ledgerwriter
+      jib:
+        project: src/ledgerwriter
+    - image: gcr.io/bank-of-anthos-ci/balancereader
+      jib:
+        project: src/balancereader
+    - image: gcr.io/bank-of-anthos-ci/transactionhistory
+      jib:
+        project: src/transactionhistory
+    - image: gcr.io/bank-of-anthos-ci/contacts
+      context: src/contacts
+    - image: gcr.io/bank-of-anthos-ci/userservice
+      context: src/userservice
+manifests:
+  rawYaml:
+    - kubernetes-manifests/balance-reader.yaml
+    - kubernetes-manifests/contacts.yaml
+    - kubernetes-manifests/ledger-writer.yaml
+    - kubernetes-manifests/transaction-history.yaml
+    - kubernetes-manifests/userservice.yaml
+deploy:
+  kubectl: {}
+---
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: frontend
+build:
+  artifacts:
+    - image: gcr.io/bank-of-anthos-ci/frontend
+      context: src/frontend
+manifests:
+  rawYaml:
+    - kubernetes-manifests/frontend.yaml
+    - kubernetes-manifests/redis.yaml
+deploy:
+  kubectl: {}
+---
+apiVersion: skaffold/v4beta4
+kind: Config
+metadata:
+  name: loadgenerator
+build:
+  artifacts:
+    - image: gcr.io/bank-of-anthos-ci/loadgenerator
+      context: src/loadgenerator
+manifests:
+  rawYaml:
+    - kubernetes-manifests/loadgenerator.yaml
+deploy:
+  kubectl: {}

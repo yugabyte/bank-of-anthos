@@ -23,14 +23,23 @@ The password to every user account in the application is `password`.
 
 This mode puts Docker images directly into minikube's container repository using skaffold for automation.
 
-1. Start minikube, and add the GCP auth extension.
+1. Start minikube.
 
     ```
-    minikube start --cpus 4 --memory 5120 --vm-driver virtualbox
+    arm64% minikube start --cpus 4 --memory 5120 --driver=docker --alsologtostderr
+    ```
+
+    ```
+    x86_64% minikube start --cpus 4 --memory 5120 --vm-driver virtualbox
+    ```
+
+1. Add the GCP auth extension.
+
+    ```
     minikube addons enable gcp-auth
     ```
 
-1. Ensure your [helm charts](https://docs.yugabyte.com/latest/quick-start/install/kubernetes/) are up to date.
+1. Ensure your [helm charts](https://docs.yugabyte.com/preview/quick-start/kubernetes/) are up to date.
 
     ```
     helm repo update
@@ -49,11 +58,11 @@ This mode puts Docker images directly into minikube's container repository using
     done
     ```
 
-1. Build the Docker containers and deploy them into Minikube.  The [magic](https://skaffold.dev/docs/environment/local-cluster/) happens in the first eval where your environment variables point skaffold to Minikube.
+1. Build the Docker containers and deploy them into Minikube.  The [magic](https://skaffold.dev/docs/environment/local-cluster/) happens in the eval statement where your environment variables point skaffold to Minikube.
 
     ```
     eval $(minikube -p minikube docker-env)
-    skaffold run
+    skaffold run -f skaffold-minikube.yaml --skip-tests
     ```
 
 1. Create the database schema on the consumer side of xCluster.
@@ -139,7 +148,7 @@ The following steps assume you already have a GKE cluster created with its crede
 1. Deploy the pods to GKE.  You will need to tell skaffold the name of your GCP project's [image registry](https://skaffold.dev/docs/environment/image-registries/).  The registry name can be determined by navigating to your project's Container Registry and observing your browser's address bar to get the full name.
 
     ```
-    skaffold run --default-repo gcr.io/yb-americas-presales/yugabyte
+    skaffold run --skip-tests --default-repo gcr.io/yb-americas-presales/yugabyte
     ```
 
    GKE Container Registry visibility should be set to **Public** under Settings.
